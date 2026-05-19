@@ -13,7 +13,7 @@ function Signup() {
 
 
 
-    const submitForm = async (e) => {
+    const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
 
         try {
             e.preventDefault()
@@ -29,14 +29,16 @@ function Signup() {
 
             Toastsuccess("Compte créer avec succès, Un email vous a été envoyé pour valider le compte")
 
-        } catch (error) {
+        } catch (error: unknown) {
+
+            const firebaseError = error as { code?: string }
             //Les liens de retour a la console
             const message = {
                 "auth/email-already-in-use": "Cet email est déjà utilisé",
                 "auth/invalid-email": "Email invalide",
                 "auth/weak-password": "Mot de passe trop faible",
                 "auth/operation-not-allowed": "Inscription désactivée",
-            }[error.code] || "Une erreur est survenue"
+            }[firebaseError.code ?? ""] || "Une erreur est survenue"
 
             Toasterror(message)
         }

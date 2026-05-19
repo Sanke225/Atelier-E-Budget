@@ -2,7 +2,7 @@ import { useState } from "react"
 import { Toasterror, Toastsuccess } from "../Controllers/ToastEmmiter"
 import axios from "axios"
 import type { DepenseType } from "../Types"
-import { DepenseStore, UseUserStore } from "../Stores"
+import { UseUserStore } from "../Stores"
 
 function AjoutDepenses() {
 
@@ -11,7 +11,7 @@ function AjoutDepenses() {
     const [categorie, setCategorie] = useState("")
     const [load, setLoad] = useState(false)
 
-    const updateDepense = DepenseStore((state) => state.updateDepense)
+    
     const { user } = UseUserStore()
 
     const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -38,6 +38,8 @@ function AjoutDepenses() {
 
             //Envoie a la DB
             await axios.post(`${serveur}/depenses.json`, objet)
+
+            
 
             setTitre("")
             setMontant(0)
