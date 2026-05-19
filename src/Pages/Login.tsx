@@ -10,9 +10,9 @@ function Login() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
 
-    
-    const submitForm = async (e) => {
-        
+
+    const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
+
         e.preventDefault()
         try {
 
@@ -35,14 +35,16 @@ function Login() {
 
             Toastsuccess("Connexion reussi...")
 
-        } catch (error) {
+        } catch (error: unknown) {
+            const firebaseError = error as { code?: string };
+
             //Les liens de retour a la console
             const message = {
                 "auth/invalid-credential": "Email ou mot de passe incorrect",
                 "auth/too-many-requests": "Trop de tentatives. Réessayez plus tard.",
                 "auth/user-not-found": "Utilisateur introuvable",
                 "auth/wrong-password": "Mot de passe incorrect",
-            }[error.code] || "Une erreur est survenue"
+            }[firebaseError.code ?? ""] || "Une erreur est survenue"
 
             Toasterror(message)
         }

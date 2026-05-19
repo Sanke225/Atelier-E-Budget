@@ -11,7 +11,6 @@ import BudgetTotalDuMois from "../Components/BudgetTotalDuMois.tsx"
 import DepenseDuMois from "../Components/DepenseMensuelleCard.tsx"
 import EpargneDuMois from "../Components/EpargneTotalcard.tsx"
 import GraphiqueDepenses from "../Components/GraphiqueDepenses.tsx"
-import ListeDepenses from "../Components/ListeDepenses.tsx"
 
 
 function Dashboard() {
