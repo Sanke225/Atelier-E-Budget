@@ -2,6 +2,8 @@ import { useState, useEffect } from "react"
 import { Toastsuccess, Toasterror } from "../Controllers/ToastEmmiter"
 import type { DepenseType } from "../Types"
 import axios from "axios"
+import { UseUserStore } from "../Stores"
+import { getDepenseByIdPath } from "../Utils/firebasePaths"
 
 type EditDepenseProps = {
   depense: DepenseType | null
@@ -10,6 +12,7 @@ type EditDepenseProps = {
 }
 
 function EditDepense({ depense, isOpen = false, onClose }: EditDepenseProps) {
+  const user = UseUserStore((state) => state.user)
   const [titre, setTitre] = useState(depense?.titre || "")
   const [montant, setMontant] = useState(depense?.depense || 0)
   const [load, setLoad] = useState(false)
@@ -23,6 +26,7 @@ function EditDepense({ depense, isOpen = false, onClose }: EditDepenseProps) {
   const editDepense = async (e: React.FormEvent<HTMLFormElement>) => {
     try {
       e.preventDefault()
+      if (!user?.uid || !depense?.id) return Toasterror("Données manquantes")
       setLoad(true)
 
       const serveur = import.meta.env.VITE_databaseURL
@@ -35,7 +39,7 @@ function EditDepense({ depense, isOpen = false, onClose }: EditDepenseProps) {
       }
 
       // Mise à jour dans Firebase
-      await axios.patch(`${serveur}/depenses/${depense?.id}.json`, updatedDepense)
+      await axios.patch(`${serveur}/${getDepenseByIdPath(user.uid, depense.id)}.json`, updatedDepense)
 
       // Mise à jour du store local (optionnel selon ton store)
       Toastsuccess("Dépense modifiée avec succès")

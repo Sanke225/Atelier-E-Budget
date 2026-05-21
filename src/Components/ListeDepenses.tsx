@@ -1,11 +1,12 @@
 import { useEffect, useState, useMemo } from "react"
-import { DepenseStore } from "../Stores"
+import { DepenseStore, UseUserStore } from "../Stores"
 import { onValue, ref, remove } from "firebase/database"
 import { database } from "../firebase"
 import { Delete, Edit } from "lucide-react"
 import { Toastsuccess, Toasterror } from "../Controllers/ToastEmmiter"
 import EditDepense from "./EditDepense"
 import type { DepenseType } from "../Types"
+import { getDepensesPath, getDepenseByIdPath } from "../Utils/firebasePaths"
 
 type ListeDepensesProps = {
     filtreActif?: string
@@ -16,13 +17,16 @@ function ListeDepenses({ filtreActif = "" }: ListeDepensesProps) {
     const depenses = DepenseStore((state) => state.depenses)
     const setDepenses = DepenseStore((state) => state.setDepenses)
     const removeDepense = DepenseStore((state) => state.removeDepense)
+    const { user } = UseUserStore()
 
     // État pour gérer l'édition
     const [editingDepenseId, setEditingDepenseId] = useState<string | null>(null)
 
     useEffect(() => {
+        if (!user?.uid) return
 
-        const depRef = ref(database, "depenses")
+        const userDepensesPath = getDepensesPath(user.uid)
+        const depRef = ref(database, userDepensesPath)
 
         const unsubscribe = onValue(depRef, (snapshot) => {
 
@@ -39,12 +43,15 @@ function ListeDepenses({ filtreActif = "" }: ListeDepensesProps) {
 
         return () => unsubscribe()
 
-    }, [])
+    }, [user?.uid])
 
     // Fonction pour supprimer une dépense
     const handleDelete = async (id: string) => {
         try {
-            const depenseRef = ref(database, `depenses/${id}`)
+            if (!user?.uid) return
+
+            const depensePath = getDepenseByIdPath(user.uid, id)
+            const depenseRef = ref(database, depensePath)
             await remove(depenseRef)
             removeDepense(id)
             Toastsuccess("Dépense supprimée avec succès")

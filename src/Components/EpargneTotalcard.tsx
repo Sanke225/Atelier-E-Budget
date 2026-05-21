@@ -2,22 +2,26 @@ import { useEffect, useState } from "react"
 import { onValue, ref, set } from "firebase/database"
 import { database } from "../firebase"
 import { Toasterror } from "../Controllers/ToastEmmiter"
+import { UseUserStore } from "../Stores"
+import { getDepensesPath, getEpargneByMonthPath } from "../Utils/firebasePaths"
 
 const BUDGET_MENSUEL = 500000
 
 const EpargneDuMois = () => {
     const [depensesMoisActuel, setDepensesMoisActuel] = useState(0)
     const [epargneCumul, setEpargneCumul] = useState(0)
+    const user = UseUserStore((state) => state.user)
 
     const now = new Date()
     const moisActuel = now.getMonth()
     const anneeActuelle = now.getFullYear()
-    const cleEpargne = `epargne/${anneeActuelle}` // Clé Firebase pour l'épargne
 
     useEffect(() => {
+        if (!user?.uid) return
+
         try {
             // 1 — Écoute les dépenses du mois actuel
-            const depenseRef = ref(database, "depenses")
+            const depenseRef = ref(database, getDepensesPath(user.uid))
             const EcouteDepenses = onValue(depenseRef, (snapshot) => {
                 const data = snapshot.val()
                 if (data) {
@@ -37,7 +41,7 @@ const EpargneDuMois = () => {
             })
 
             // 2 — Écoute l'épargne cumulative depuis Firebase
-            const epargneRef = ref(database, cleEpargne)
+            const epargneRef = ref(database, `users/${user.uid}/epargne/${anneeActuelle}`)
             const EcouteEpargne = onValue(epargneRef, (snapshot) => {
                 const data = snapshot.val()
                 if (data) {
@@ -57,18 +61,19 @@ const EpargneDuMois = () => {
             console.log(error)
             Toasterror("Erreur lors du calcul de l'épargne")
         }
-    }, [])
+    }, [user?.uid, anneeActuelle])
 
     // 3 — Sauvegarde l'épargne du mois actuel dans Firebase
     useEffect(() => {
+        if (!user?.uid) return
         if (depensesMoisActuel === 0) return
         const resteduMois = BUDGET_MENSUEL - depensesMoisActuel
         if (resteduMois <= 0) return
 
-        // On sauvegarde sous epargne/2025/mois (ex: epargne/2025/4 pour Mai)
-        const epargneduMoisRef = ref(database, `${cleEpargne}/${moisActuel}`)
+        // On sauvegarde sous users/{userId}/epargne/2025/mois (ex: users/{userId}/epargne/2025/4 pour Mai)
+        const epargneduMoisRef = ref(database, `users/${user.uid}/epargne/${anneeActuelle}/${moisActuel}`)
         set(epargneduMoisRef, resteduMois)
-    }, [depensesMoisActuel])
+    }, [depensesMoisActuel, user?.uid, anneeActuelle, moisActuel])
 
     // Calculs affichage
     const resteduMois = BUDGET_MENSUEL - depensesMoisActuel

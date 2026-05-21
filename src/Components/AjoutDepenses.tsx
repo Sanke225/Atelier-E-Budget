@@ -3,6 +3,7 @@ import { Toasterror, Toastsuccess } from "../Controllers/ToastEmmiter"
 import axios from "axios"
 import type { DepenseType } from "../Types"
 import { UseUserStore, BudgetStore } from "../Stores"
+import { getDepensesPath } from "../Utils/firebasePaths"
 
 type AjoutDepensesProps = {
     isOpen?: boolean
@@ -51,8 +52,9 @@ function AjoutDepenses({ isOpen = false, onClose, categoriePredefinie = "" }: Aj
                 createdAt: Date.now()
             }
 
-            //Envoie a la DB
-            await axios.post(`${serveur}/depenses.json`, objet)
+            //Envoie a la DB avec le chemin utilisateur
+            const userPath = getDepensesPath(user.uid)
+            await axios.post(`${serveur}/${userPath}.json`, objet)
 
             
 

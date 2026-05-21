@@ -2,12 +2,17 @@ import { useEffect, useState } from "react"
 import { onValue, ref } from "firebase/database"
 import { database } from "../firebase"
 import type { DepenseType } from "../Types"
+import { UseUserStore } from "../Stores"
+import { getDepensesPath } from "../Utils/firebasePaths"
 
 const HistoriqueDesDepenses = () => {
     const [depenses, setDepenses] = useState<DepenseType[]>([])
+    const user = UseUserStore((state) => state.user)
 
     useEffect(() => {
-        const depRef = ref(database, "depenses")
+        if (!user?.uid) return
+
+        const depRef = ref(database, getDepensesPath(user.uid))
         const unsubscribe = onValue(depRef, (snapshot) => {
             const data = snapshot.val()
             const formatted: DepenseType[] = data
@@ -22,7 +27,7 @@ const HistoriqueDesDepenses = () => {
             setDepenses(dix)
         })
         return () => unsubscribe()
-    }, [])
+    }, [user?.uid])
 
     return (
         <div>

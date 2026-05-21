@@ -2,12 +2,15 @@ import { useEffect, useState } from "react"
 import { onValue, ref } from "firebase/database"
 import { database } from "../firebase"
 import { Toasterror } from "../Controllers/ToastEmmiter"
+import { UseUserStore } from "../Stores"
+import { getDepensesPath } from "../Utils/firebasePaths"
 
 const MOIS = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"]
 
 const DepenseDuMois = () => {
     const [depensesMoisActuel, setDepensesMoisActuel] = useState(0)
     const [depensesMoisPasse, setDepensesMoisPasse] = useState(0)
+    const user = UseUserStore((state) => state.user)
 
     const now = new Date()
     const moisActuel = now.getMonth()      // 0-11
@@ -18,8 +21,10 @@ const DepenseDuMois = () => {
     const anneePasse = moisActuel === 0 ? anneeActuelle - 1 : anneeActuelle
 
     useEffect(() => {
+        if (!user?.uid) return
+
         try {
-            const depenseRef = ref(database, "depenses")
+            const depenseRef = ref(database, getDepensesPath(user.uid))
             const Ecoute = onValue(depenseRef, (snapshot) => {
                 const data = snapshot.val()
                 if (data) {
@@ -59,7 +64,7 @@ const DepenseDuMois = () => {
             console.log(error)
             Toasterror("Erreur lors de la récupération des dépenses")
         }
-    }, [])
+    }, [user?.uid])
 
     // Comparaison avec le mois passé
     const diff = depensesMoisPasse > 0

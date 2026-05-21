@@ -16,6 +16,7 @@ import { useEffect, useState } from "react"
 import type { BudgetType } from "../Types"
 import { onValue, ref } from "firebase/database"
 import { database } from "../firebase"
+import { getBudgetsPath, getBudgetByIdPath, getDepensesPath } from "../Utils/firebasePaths"
 
 // Props pour recevoir la fonction d'ouverture du sidebar depuis App
 type DashboardProps = {
@@ -40,10 +41,12 @@ function Dashboard({ sidebarOpen, setSidebarOpen }: DashboardProps) {
 
     // Chargement des budgets depuis Firebase au démarrage
     useEffect(() => {
+        if (!user?.uid) return
+
         const chargerBudgets = async () => {
             try {
                 const serveur = import.meta.env.VITE_databaseURL
-                const response = await axios.get(`${serveur}/budget.json`)
+                const response = await axios.get(`${serveur}/${getBudgetsPath(user.uid)}.json`)
                 const data = response.data
 
                 if (data) {
@@ -53,7 +56,6 @@ function Dashboard({ sidebarOpen, setSidebarOpen }: DashboardProps) {
                             ...data[key],
                             id: key
                         }))
-                        .filter(item => item.idUser === user?.uid)
 
                     // Mettre à jour le store uniquement si différent
                     budgetsArray.forEach(item => {
@@ -67,14 +69,14 @@ function Dashboard({ sidebarOpen, setSidebarOpen }: DashboardProps) {
             }
         }
 
-        if (user?.uid) {
-            chargerBudgets()
-        }
+        chargerBudgets()
     }, [user?.uid])
 
     // Écoute des dépenses en temps réel pour calculer les totaux par catégorie
     useEffect(() => {
-        const depenseRef = ref(database, "depenses")
+        if (!user?.uid) return
+
+        const depenseRef = ref(database, getDepensesPath(user.uid))
         const unsubscribe = onValue(depenseRef, (snapshot) => {
             const data = snapshot.val()
             if (data) {
@@ -96,7 +98,7 @@ function Dashboard({ sidebarOpen, setSidebarOpen }: DashboardProps) {
         })
 
         return () => unsubscribe()
-    }, [])
+    }, [user?.uid])
 
     // Fonction pour obtenir les données calculées d'un budget
     const getBudgetCalcule = (budgetItem: BudgetType) => {
@@ -110,9 +112,11 @@ function Dashboard({ sidebarOpen, setSidebarOpen }: DashboardProps) {
     }
 
     const buttonDelete = async (id: string) => {
+        if (!user?.uid) return
+
         try {
             const serveur = import.meta.env.VITE_databaseURL
-            await axios.delete(`${serveur}/budget/${id}.json`)
+            await axios.delete(`${serveur}/${getBudgetByIdPath(user.uid, id)}.json`)
             deleteBudget(id)
             Toastsuccess("Budget supprimé avec succès")
         } catch (error) {

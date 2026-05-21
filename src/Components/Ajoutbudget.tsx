@@ -4,6 +4,7 @@ import { BudgetStore, UseUserStore } from "../Stores"
 import { Toasterror, Toastsuccess } from "../Controllers/ToastEmmiter"
 import type { BudgetType } from "../Types"
 import axios from "axios"
+import { getBudgetsPath } from "../Utils/firebasePaths"
 
 type AjoutbudgetProps = {
     isOpen?: boolean
@@ -36,7 +37,7 @@ function Ajoutbudget({ isOpen = false, onClose }: AjoutbudgetProps) {
                 idUser: user?.uid
             }
 
-            const req = await axios.post(`${serveur}/budget.json`, objet)
+            const req = await axios.post(`${serveur}/${getBudgetsPath(user.uid)}.json`, objet)
             const data = req.data
 
             //On ajoute le budget au store

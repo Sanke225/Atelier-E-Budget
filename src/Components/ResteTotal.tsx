@@ -1,8 +1,9 @@
 import { useEffect } from "react"
-import { ResteStore } from "../Stores"
+import { ResteStore, UseUserStore } from "../Stores"
 import { onValue, ref } from "firebase/database"
 import { database } from "../firebase"
 import { Toasterror } from "../Controllers/ToastEmmiter"
+import { getBudgetsPath } from "../Utils/firebasePaths"
 
 const BUDGET_MENSUEL = 500000
 
@@ -12,6 +13,7 @@ const ResteTotal = () => {
 
     const budgets = ResteStore((state) => state.reste) //Le store des budgets
     const setBudgets = ResteStore((state) => state.resteTotal)//Le store de mise a jour des budgets
+    const user = UseUserStore((state) => state.user)
 
     //Date actuelle
     const now = new Date()
@@ -20,8 +22,10 @@ const ResteTotal = () => {
 
     //RECUPERATION FIREBAS
     useEffect(() => {
+        if (!user?.uid) return
+
         try {
-            const budgetRef = ref(database, "budget") //Reference firebase
+            const budgetRef = ref(database, getBudgetsPath(user.uid)) //Reference firebase
             const Ecoute = onValue(budgetRef, (snapshot) => { //Ecoute temps réel firebase
                 const data = snapshot.val() //Données depuis firebase
                 if (data) {
@@ -40,7 +44,7 @@ const ResteTotal = () => {
             Toasterror("Erreur lors de la récupération des budgets")
         }
 
-    }, [setBudgets])
+    }, [setBudgets, user?.uid])
 
     //CALCULS
     const totalDepense = budgets.reduce((acc, item) => {  //Total des dépenses

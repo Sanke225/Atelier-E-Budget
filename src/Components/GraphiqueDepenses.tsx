@@ -2,18 +2,23 @@ import { useEffect, useState } from "react"
 import { onValue, ref } from "firebase/database"
 import { database } from "../firebase"
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts"
+import { UseUserStore } from "../Stores"
+import { getBudgetsPath, getDepensesPath } from "../Utils/firebasePaths"
 
 const MOIS = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"]
 
 const GraphiqueDepenses = () => {
     const [data, setData] = useState<{ nom: string, montant: number, depense: number }[]>([])
+    const user = UseUserStore((state) => state.user)
 
     const now = new Date()
     const moisActuel = now.getMonth()
     const anneeActuelle = now.getFullYear()
 
     useEffect(() => {
-        const budgetRef = ref(database, "budget")
+        if (!user?.uid) return
+
+        const budgetRef = ref(database, getBudgetsPath(user.uid))
         const EcouteBudget = onValue(budgetRef, (snapshot) => {
             const dataBudget = snapshot.val()
             if (!dataBudget) return
@@ -23,7 +28,7 @@ const GraphiqueDepenses = () => {
                 ...value
             }))
 
-            const depenseRef = ref(database, "depenses")
+            const depenseRef = ref(database, getDepensesPath(user.uid))
             onValue(depenseRef, (snapDepense) => {
                 const dataDepense = snapDepense.val()
 
@@ -64,7 +69,7 @@ const GraphiqueDepenses = () => {
         })
 
         return () => EcouteBudget()
-    }, [])
+    }, [user?.uid])
 
     return (
         <div className="bg-white border border-gray-200 rounded-xl p-4 md:p-5 shadow-sm w-full h-full flex flex-col justify-center">
