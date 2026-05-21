@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import GmailConnection from "../Components/GmailConnection"
 import { useState } from "react"
 import { createUserWithEmailAndPassword, sendEmailVerification, updateProfile } from "firebase/auth"
@@ -10,6 +10,7 @@ function Signup() {
     const [nom, setNom] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPasword] = useState("")
+    const navigate = useNavigate()
 
 
 
@@ -27,7 +28,12 @@ function Signup() {
             //J'envoie un email pour valider le compte
             await sendEmailVerification(data.user)
 
-            Toastsuccess("Compte créer avec succès, Un email vous a été envoyé pour valider le compte")
+            Toastsuccess("Compte créé avec succès ! Un email vous a été envoyé pour valider le compte")
+
+            // Rediriger vers la page de connexion
+            setTimeout(() => {
+                navigate("/")
+            }, 2000) // Attendre 2 secondes pour que l'utilisateur voit le message
 
         } catch (error: unknown) {
 

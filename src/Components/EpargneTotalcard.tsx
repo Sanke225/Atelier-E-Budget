@@ -3,7 +3,7 @@ import { onValue, ref, set } from "firebase/database"
 import { database } from "../firebase"
 import { Toasterror } from "../Controllers/ToastEmmiter"
 import { UseUserStore } from "../Stores"
-import { getDepensesPath, getEpargneByMonthPath } from "../Utils/firebasePaths"
+import { getDepensesPath } from "../Utils/firebasePaths"
 
 const BUDGET_MENSUEL = 500000
 

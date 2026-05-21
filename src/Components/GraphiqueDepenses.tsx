@@ -18,7 +18,8 @@ const GraphiqueDepenses = () => {
     useEffect(() => {
         if (!user?.uid) return
 
-        const budgetRef = ref(database, getBudgetsPath(user.uid))
+        const userId = user.uid // Capturer dans une variable locale
+        const budgetRef = ref(database, getBudgetsPath(userId))
         const EcouteBudget = onValue(budgetRef, (snapshot) => {
             const dataBudget = snapshot.val()
             if (!dataBudget) return
@@ -28,7 +29,7 @@ const GraphiqueDepenses = () => {
                 ...value
             }))
 
-            const depenseRef = ref(database, getDepensesPath(user.uid))
+            const depenseRef = ref(database, getDepensesPath(userId))
             onValue(depenseRef, (snapDepense) => {
                 const dataDepense = snapDepense.val()
 

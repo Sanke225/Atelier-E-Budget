@@ -43,10 +43,12 @@ function Dashboard({ sidebarOpen, setSidebarOpen }: DashboardProps) {
     useEffect(() => {
         if (!user?.uid) return
 
+        const userId = user.uid // Capturer dans une variable locale
+
         const chargerBudgets = async () => {
             try {
                 const serveur = import.meta.env.VITE_databaseURL
-                const response = await axios.get(`${serveur}/${getBudgetsPath(user.uid)}.json`)
+                const response = await axios.get(`${serveur}/${getBudgetsPath(userId)}.json`)
                 const data = response.data
 
                 if (data) {
@@ -76,7 +78,8 @@ function Dashboard({ sidebarOpen, setSidebarOpen }: DashboardProps) {
     useEffect(() => {
         if (!user?.uid) return
 
-        const depenseRef = ref(database, getDepensesPath(user.uid))
+        const userId = user.uid // Capturer dans une variable locale
+        const depenseRef = ref(database, getDepensesPath(userId))
         const unsubscribe = onValue(depenseRef, (snapshot) => {
             const data = snapshot.val()
             if (data) {
@@ -114,9 +117,11 @@ function Dashboard({ sidebarOpen, setSidebarOpen }: DashboardProps) {
     const buttonDelete = async (id: string) => {
         if (!user?.uid) return
 
+        const userId = user.uid // Capturer dans une variable locale
+
         try {
             const serveur = import.meta.env.VITE_databaseURL
-            await axios.delete(`${serveur}/${getBudgetByIdPath(user.uid, id)}.json`)
+            await axios.delete(`${serveur}/${getBudgetByIdPath(userId, id)}.json`)
             deleteBudget(id)
             Toastsuccess("Budget supprimé avec succès")
         } catch (error) {
