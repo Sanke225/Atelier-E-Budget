@@ -41,5 +41,43 @@
       "form_factor": "wide",
       "label": "Vue desktop du tableau de bord"
     }
+  ],
+  "shortcuts": [
+    {
+      "name": "Ajouter une dépense",
+      "short_name": "Dépense",
+      "description": "Ajouter rapidement une nouvelle dépense",
+      "url": "/budget",
+      "icons": [
+        {
+          "src": "/images/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Tableau de bord",
+      "short_name": "Dashboard",
+      "description": "Voir le tableau de bord",
+      "url": "/dashboard",
+      "icons": [
+        {
+          "src": "/images/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    },
+    {
+      "name": "Mon profil",
+      "short_name": "Profil",
+      "description": "Gérer mon profil",
+      "url": "/profil",
+      "icons": [
+        {
+          "src": "/images/icon-192.png",
+          "sizes": "192x192"
+        }
+      ]
+    }
   ]
 }
