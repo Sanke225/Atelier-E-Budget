@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import GmailConnection from "../Components/GmailConnection"
 import { useState } from "react"
 import { sendEmailVerification, signInWithEmailAndPassword, signOut, setPersistence, browserLocalPersistence } from "firebase/auth"
@@ -10,6 +10,7 @@ function Login() {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [showResendButton, setShowResendButton] = useState(false)
+    const navigate = useNavigate()
 
 
     const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -39,7 +40,10 @@ function Login() {
                 return;
             }
 
-            Toastsuccess("Connexion reussi...")
+            Toastsuccess("Connexion réussie...")
+
+            // Rediriger vers le dashboard
+            navigate("/dashboard")
 
         } catch (error: unknown) {
             const firebaseError = error as { code?: string }
