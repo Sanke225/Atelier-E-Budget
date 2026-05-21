@@ -20,6 +20,9 @@ function Depenses({ sidebarOpen, setSidebarOpen }: DepensesProps) {
     // État pour gérer le filtre actif
     const [filtreActif, setFiltreActif] = useState<string>("")
 
+    console.log(import.meta.env.VITE_FIREBASE_API_KEY)
+
+
     return (
         <div className="flex min-h-screen">
             {/* Sidebar responsive */}

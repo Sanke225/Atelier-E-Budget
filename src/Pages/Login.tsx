@@ -1,14 +1,46 @@
-import { Link } from "react-router-dom"
+import { Link, useNavigate } from "react-router-dom"
 import GmailConnection from "../Components/GmailConnection"
-import { useState } from "react"
-import { sendEmailVerification, signInWithEmailAndPassword, signOut } from "firebase/auth"
+import { useState, useEffect } from "react"
+import { sendEmailVerification, signInWithEmailAndPassword, signOut, getRedirectResult } from "firebase/auth"
 import { auth } from "../firebase"
 import { Toasterror, Toastsuccess } from "../Controllers/ToastEmmiter"
+import { UseUserStore } from "../Stores"
 
 function Login() {
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const navigate = useNavigate()
+    const updateUser = UseUserStore(state => state.updateUser)
+
+    // Gérer le résultat du redirect Google (pour mobile)
+    useEffect(() => {
+        const handleRedirectResult = async () => {
+            try {
+                const result = await getRedirectResult(auth)
+                if (result?.user) {
+                    Toastsuccess("Vous avez été connecté via votre compte gmail...")
+
+                    // Mettre à jour le store
+                    updateUser({
+                        uid: result.user.uid,
+                        nom: result.user.displayName || "Utilisateur",
+                        email: result.user.email || undefined,
+                        tel: result.user.phoneNumber || undefined,
+                        photoURL: result.user.photoURL || undefined
+                    })
+
+                    // Rediriger vers le dashboard
+                    navigate("/dashboard")
+                }
+            } catch (error) {
+                console.error("Erreur redirect:", error)
+                Toasterror("Erreur lors de la connexion avec Google")
+            }
+        }
+
+        handleRedirectResult()
+    }, [])
 
 
     const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
