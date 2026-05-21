@@ -28,23 +28,23 @@ function Signup() {
             //J'envoie un email pour valider le compte
             await sendEmailVerification(data.user)
 
-            Toastsuccess("Compte créé avec succès ! Un email vous a été envoyé pour valider le compte")
+            Toastsuccess("Compte créé avec succès ! Redirection vers la connexion...")
 
-            // Rediriger vers la page de connexion
-            setTimeout(() => {
-                navigate("/")
-            }, 2000) // Attendre 2 secondes pour que l'utilisateur voit le message
+            // Rediriger immédiatement vers la page de connexion
+            navigate("/")
 
         } catch (error: unknown) {
 
-            const firebaseError = error as { code?: string }
+            const firebaseError = error as { code?: string, message?: string }
+            console.error("Erreur d'inscription complète:", error)
+
             //Les liens de retour a la console
             const message = {
                 "auth/email-already-in-use": "Cet email est déjà utilisé",
                 "auth/invalid-email": "Email invalide",
-                "auth/weak-password": "Mot de passe trop faible",
+                "auth/weak-password": "Mot de passe trop faible (minimum 6 caractères)",
                 "auth/operation-not-allowed": "Inscription désactivée",
-            }[firebaseError.code ?? ""] || "Une erreur est survenue"
+            }[firebaseError.code ?? ""] || `Une erreur est survenue: ${firebaseError.message || "Inconnue"}`
 
             Toasterror(message)
         }
