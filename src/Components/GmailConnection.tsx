@@ -1,4 +1,4 @@
-import { GoogleAuthProvider, signInWithPopup, signInWithRedirect, setPersistence, browserLocalPersistence } from 'firebase/auth'
+import { GoogleAuthProvider, signInWithPopup, setPersistence, browserLocalPersistence } from 'firebase/auth'
 import { Toasterror, Toastsuccess } from '../Controllers/ToastEmmiter'
 import { auth } from '../firebase'
 import { UseUserStore } from '../Stores'
@@ -9,11 +9,6 @@ function GmailConnection() {
     const updateUser = UseUserStore(state => state.updateUser)
     const navigate = useNavigate()
 
-    // Fonction pour détecter si on est sur mobile
-    const isMobile = () => {
-        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent)
-    }
-
     const Googleauth = async () => {
         try {
             // Configurer la persistance locale
@@ -21,39 +16,39 @@ function GmailConnection() {
 
             const provider = new GoogleAuthProvider()
 
-            // Utiliser redirect sur mobile, popup sur desktop
-            if (isMobile()) {
-                // Sur mobile, utiliser redirect
-                await signInWithRedirect(auth, provider)
-                // La redirection va se faire automatiquement
-                // Le résultat sera géré dans Login.tsx avec getRedirectResult
+            // Utiliser uniquement popup (fonctionne sur mobile moderne)
+            const data = await signInWithPopup(auth, provider)
+
+            if (data?.user) {
+                Toastsuccess("Vous avez été connecté via votre compte gmail...")
+
+                //On ajoute l'utilisateur dans le store
+                updateUser({
+                    uid: data.user.uid,
+                    nom: data.user.displayName!,
+                    email: data.user.email!,
+                    photoURL: data.user.photoURL || undefined
+                })
+
+                //On redirige vers le backoffice
+                navigate("/dashboard")
+
+                console.log("Google user data:", data.user)
             } else {
-                // Sur desktop, utiliser popup
-                const data = await signInWithPopup(auth, provider)
-
-                if (data?.user) {
-                    Toastsuccess("Vous avez été connecté via votre compte gmail...")
-
-                    //On ajoute l'utilisateur dans le store
-                    updateUser({
-                        uid: data.user.uid,
-                        nom: data.user.displayName!,
-                        email: data.user.email!,
-                        photoURL: data.user.photoURL || undefined
-                    })
-
-                    //On redirige vers le backoffice
-                    navigate("/dashboard")
-
-                    console.log("Google user data:", data.user)
-                } else {
-                    Toasterror("Une erreur a été commise...")
-                }
+                Toasterror("Une erreur a été commise...")
             }
 
-        } catch (error) {
+        } catch (error: any) {
             console.log(error)
-            Toasterror("Une erreur a été commise...")
+
+            // Message spécifique pour popup bloqué
+            if (error.code === 'auth/popup-blocked') {
+                Toasterror("Popup bloqué ! Veuillez autoriser les popups pour ce site.")
+            } else if (error.code === 'auth/popup-closed-by-user') {
+                Toasterror("Connexion annulée")
+            } else {
+                Toasterror("Erreur lors de la connexion avec Google")
+            }
         }
     }
 
