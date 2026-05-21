@@ -4,9 +4,13 @@ import { Toastsuccess, Toasterror } from "../Controllers/ToastEmmiter"
 import type { BudgetType } from "../Types"
 import axios from "axios"
 
+type EditButtonProps = {
+  budget: BudgetType | null
+  isOpen?: boolean
+  onClose?: () => void
+}
 
-
-function EditButton({ budget }: { budget: BudgetType | null }) { //Il reçoit BUDGET en props
+function EditButton({ budget, isOpen = false, onClose }: EditButtonProps) { //Il reçoit BUDGET en props
   const updateBudgetItem = BudgetStore(state => state.updateBudgetItem) // J'appelle depuis mon store, pour modifier mes state dans la globalité
   const [tittre, setTittre] = useState(budget?.tittre || "") //Si budget existe, Use titre sinon Rien
   const [montant, setMontant] = useState(budget?.montant || 0) // Si bugget existe, Use montant sinon Rien
@@ -39,7 +43,9 @@ function EditButton({ budget }: { budget: BudgetType | null }) { //Il reçoit BU
       await axios.patch(`${serveur}/budget/${budget?.id}.json`, updatedBudget)
       updateBudgetItem(updatedBudget) // Mets a jour les states globale depuis Zustand
       Toastsuccess("Budget modifié avec succès")
-       //Fermerture du modal
+
+      // Fermerture du modal
+      if (onClose) onClose()
     } catch (error) {
       console.log(error)
       Toasterror("Erreur lors de la modification")
@@ -48,8 +54,10 @@ function EditButton({ budget }: { budget: BudgetType | null }) { //Il reçoit BU
     }
   }
 
+  if (!isOpen) return null
+
   return (
-    <dialog className="modal" role="dialog" id={`edit-budget-modal-${budget?.id}`}>
+    <div className="modal modal-open">
       <div className="modal-box">
         <h3 className="text-lg font-bold mb-3">Modifier le budget</h3>
         <form className="flex flex-col gap-3" onSubmit={editbudget}>
@@ -60,14 +68,13 @@ function EditButton({ budget }: { budget: BudgetType | null }) { //Il reçoit BU
           </button>
         </form>
         <div className="modal-action">
-          <form method="dialog">
-            <button type="submit" className="btn">
-              Fermer !
-            </button>
-          </form>
+          <button type="button" onClick={onClose} className="btn">
+            Fermer !
+          </button>
         </div>
       </div>
-    </dialog>
+      <div className="modal-backdrop" onClick={onClose}></div>
+    </div>
   )
 }
 

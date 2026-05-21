@@ -4,7 +4,6 @@ import { database } from "../firebase"
 import { Toasterror } from "../Controllers/ToastEmmiter"
 
 const BUDGET_MENSUEL = 500000
-const MOIS = ["Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"]
 
 const EpargneDuMois = () => {
     const [depensesMoisActuel, setDepensesMoisActuel] = useState(0)
@@ -77,7 +76,7 @@ const EpargneDuMois = () => {
     const danger = resteduMois < 0
 
     return (
-        <div className="relative overflow-hidden bg-white border border-gray-200 rounded-xl p-5 w-full max-w-xs shadow-sm">
+        <div className="relative overflow-hidden bg-white border border-gray-200 rounded-xl p-5 w-full shadow-sm min-h-50 flex flex-col justify-between">
             {/* Décoration */}
             <div className="absolute top-0 right-0 w-20 h-20 rounded-bl-full bg-orange-200 opacity-60 pointer-events-none" />
 
@@ -95,10 +94,7 @@ const EpargneDuMois = () => {
             {/* Pourcentage */}
             <div className="mb-3">
                 <div className="h-1.5 rounded-full bg-gray-100 overflow-hidden">
-                    <div
-                        className={`h-full rounded-full transition-all duration-500 ${danger ? "bg-red-500" : "bg-neutral"}`}
-                        style={{ width: `${Math.max(0, pourcentage)}%` }}
-                    />
+                    <div className={`h-full rounded-full transition-all duration-500 ${danger ? "bg-red-500" : "bg-neutral"}`} style={{ width: `${Math.max(0, pourcentage)}%` }} />
                 </div>
                 <p className="text-xs text-gray-400 mt-1">
                     {pourcentage}% économisé sur {BUDGET_MENSUEL.toLocaleString("fr-FR")} F CFA
@@ -112,13 +108,6 @@ const EpargneDuMois = () => {
                 </span>
                 <span className="text-xs font-medium text-blue-600">
                     {epargneCumul.toLocaleString("fr-FR")} F CFA
-                </span>
-            </div>
-
-            {/* Mois actuel */}
-            <div className="mt-1">
-                <span className="text-xs text-gray-400">
-                    Reste de {MOIS[moisActuel]} mis en épargne
                 </span>
             </div>
         </div>

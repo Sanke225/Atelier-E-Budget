@@ -81,7 +81,7 @@ const DepenseDuMois = () => {
             : "text-emerald-500"
 
     return (
-        <div className="relative overflow-hidden bg-white border border-gray-200 rounded-xl p-5 w-full max-w-xs shadow-sm">
+        <div className="relative overflow-hidden bg-white border border-gray-200 rounded-xl p-5 w-full shadow-sm min-h-[200px] flex flex-col justify-between">
             {/* Décoration */}
             <div className="absolute top-0 right-0 w-20 h-20 rounded-bl-full bg-orange-300 opacity-60 pointer-events-none" />
 

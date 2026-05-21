@@ -10,11 +10,37 @@ import Depenses from "./Pages/Depenses"
 import Navbar from "./Components/Navbar"
 import Profil from "./Pages/Profil"
 import { UseUserStore } from "./Stores"
+import { useState, useEffect } from "react"
+import { onAuthStateChanged } from "firebase/auth"
+import { auth } from "./firebase"
 
 // Composant séparé car useLocation ne fonctionne qu'à l'intérieur de BrowserRouter
 const AppContent = () => {
   const location = useLocation()
   const user = UseUserStore(state => state.user)
+  const updateUser = UseUserStore(state => state.updateUser)
+
+  // État pour gérer l'ouverture du sidebar sur mobile
+  const [sidebarOpen, setSidebarOpen] = useState(false)
+
+  // Synchroniser Firebase Auth avec le store Zustand
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser) => {
+      if (firebaseUser) {
+        console.log("Firebase user photoURL:", firebaseUser.photoURL)
+        // Mettre à jour le store avec les données de Firebase Auth
+        updateUser({
+          uid: firebaseUser.uid,
+          nom: firebaseUser.displayName || "Utilisateur",
+          email: firebaseUser.email || undefined,
+          tel: firebaseUser.phoneNumber || undefined,
+          photoURL: firebaseUser.photoURL || undefined
+        })
+      }
+    })
+
+    return () => unsubscribe()
+  }, [updateUser])
 
   // Pages où la Navbar ne doit PAS s'afficher
   const pagesPubliques = ["/", "/signup"]
@@ -24,7 +50,7 @@ const AppContent = () => {
     <>
       {afficherNavbar && (
         <div className="sticky top-0 z-50">
-          <Navbar />
+          <Navbar onMenuClick={() => setSidebarOpen(!sidebarOpen)} />
         </div>
       )}
       <Routes>
@@ -32,15 +58,15 @@ const AppContent = () => {
         <Route path="/signup" element={<Signup />} />
 
         <Route path="/dashboard" element={
-          <AuthProvider pageAutorise={<Dashboard />} />
+          <AuthProvider pageAutorise={<Dashboard sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />} />
         } />
 
         <Route path="/budget" element={
-          <AuthProvider pageAutorise={<Depenses />} />
+          <AuthProvider pageAutorise={<Depenses sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />} />
         } />
 
         <Route path="/profil" element={
-          <AuthProvider pageAutorise={<Profil />} />
+          <AuthProvider pageAutorise={<Profil sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />} />
         } />
 
 

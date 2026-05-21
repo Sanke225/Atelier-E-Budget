@@ -8,3 +8,18 @@
     background-repeat: no-repeat;
     opacity: 1;
 }
+
+/* Masquer la scrollbar pour les carrousels */
+.scrollbar-hide {
+    -ms-overflow-style: none;  /* IE et Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;  /* Chrome, Safari et Opera */
+}
+
+/* Smooth scroll pour les carrousels */
+.snap-x {
+    scroll-behavior: smooth;
+}

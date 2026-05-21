@@ -3,7 +3,8 @@ export type UserType = {
     nom: string,
     email?: string,
     password?: string,
-    tel?: string
+    tel?: string,
+    photoURL?: string
 }
 
 export type BudgetType = {

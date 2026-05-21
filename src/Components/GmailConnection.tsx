@@ -20,13 +20,15 @@ function GmailConnection() {
                 //On ajoute l'utilisateur dans le store
                 updateUser({
                     uid: data.user.uid,
-                    nom: data.user.displayName!
+                    nom: data.user.displayName!,
+                    email: data.user.email!,
+                    photoURL: data.user.photoURL || undefined
                 })
 
                 //On redirige vers le backoffice
                 navigate("/dashboard")
 
-                console.log(data.user)
+                console.log("Google user data:", data.user)
             } else {
                 Toasterror("Une erreur a été commise...")
             }

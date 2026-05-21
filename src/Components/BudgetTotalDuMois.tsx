@@ -7,7 +7,7 @@ function BudgetTotalDuMois() {
     const moisSuivant = MOIS[(now.getMonth() + 1) % 12]
 
     return (
-        <div className="relative overflow-hidden bg-white border border-gray-200 rounded-xl p-5 w-full max-w-xs shadow-sm">
+        <div className="relative overflow-hidden bg-white border border-gray-200 rounded-xl p-5 w-full shadow-sm min-h-[200px] flex flex-col justify-between">
             <div className="">
                 <p className='font-mono stat-title text-xs font-medium uppercase tracking-widest text-gray-500'>Budget du mois</p>
                 <p className='font-mono text-2xl font-medium stat-value my-3'>500 000 <span className="text-base font-normal text-gray-400">F CFA</span></p>

@@ -5,7 +5,12 @@ import { Toasterror, Toastsuccess } from "../Controllers/ToastEmmiter"
 import type { BudgetType } from "../Types"
 import axios from "axios"
 
-function Ajoutbudget() {
+type AjoutbudgetProps = {
+    isOpen?: boolean
+    onClose?: () => void
+}
+
+function Ajoutbudget({ isOpen = false, onClose }: AjoutbudgetProps) {
 
     const updateBudget = BudgetStore(state => state.updateBudget)
     const user = UseUserStore(state => state.user)
@@ -40,10 +45,10 @@ function Ajoutbudget() {
             setTitre("")
             setMontant(0)
 
-            Toastsuccess("Budget ajouter avec succès...")
+            Toastsuccess("Budget ajouté avec succès...")
 
             //Pour fermer le modal
-            document.getElementById("close")?.click()
+            if (onClose) onClose()
 
         } catch (error) {
             console.log(error)
@@ -53,25 +58,26 @@ function Ajoutbudget() {
         }
     }
 
+    if (!isOpen) return null
+
     return (
-        <div>
-            <div className="modal" role="dialog" id="ajout-budget-modal">
-                <div className="modal-box">
-                    <h3 className="text-lg font-bold mb-3">Nouveau budget</h3>
-                    <form className="flex flex-col gap-3" onSubmit={(e) => SubmitForm(e)}>
-                        <input value={tittre} onChange={(e) => setTitre(e.target.value)} type="text" placeholder="Titre du budget" required className="input input-lg w-full" />
-                        <input value={montant} onChange={(e) => setMontant(Number(e.target.value))} type="number" placeholder="Montant" required className="input input-lg w-full" />
-                        <button type="submit" aria-label="Ajoutez un budget" className="btn btn-neutral" disabled={load}>
-                            {!load ? (
-                                <span>Ajouter</span>
-                            ) : <span>En cours...</span>}
-                        </button>
-                    </form>
-                    <div className="modal-action">
-                        <a id="close" aria-label="Fermerture" href="#" className="btn">Fermer !</a>
-                    </div>
+        <div className="modal modal-open">
+            <div className="modal-box">
+                <h3 className="text-lg font-bold mb-3">Nouveau budget</h3>
+                <form className="flex flex-col gap-3" onSubmit={(e) => SubmitForm(e)}>
+                    <input value={tittre} onChange={(e) => setTitre(e.target.value)} type="text" placeholder="Titre du budget" required className="input input-lg w-full" />
+                    <input value={montant} onChange={(e) => setMontant(Number(e.target.value))} type="number" placeholder="Montant" required className="input input-lg w-full" />
+                    <button type="submit" aria-label="Ajoutez un budget" className="btn btn-neutral" disabled={load}>
+                        {!load ? (
+                            <span>Ajouter</span>
+                        ) : <span>En cours...</span>}
+                    </button>
+                </form>
+                <div className="modal-action">
+                    <button type="button" onClick={onClose} className="btn">Fermer !</button>
                 </div>
             </div>
+            <div className="modal-backdrop" onClick={onClose}></div>
         </div>
     )
 }

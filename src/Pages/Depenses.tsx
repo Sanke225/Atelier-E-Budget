@@ -5,57 +5,143 @@ import ResteTotal from "../Components/ResteTotal"
 import DepenseDuMois from "../Components/DepenseMensuelleCard"
 import BudgetTotalDuMois from "../Components/BudgetTotalDuMois"
 import EpargneDuMois from "../Components/EpargneTotalcard"
+import { useState } from "react"
 
-function Depenses() {
+// Props pour recevoir la fonction d'ouverture du sidebar depuis App
+type DepensesProps = {
+    sidebarOpen: boolean
+    setSidebarOpen: (open: boolean) => void
+}
+
+function Depenses({ sidebarOpen, setSidebarOpen }: DepensesProps) {
+    // État pour gérer l'ouverture du modal
+    const [showAddDepenseModal, setShowAddDepenseModal] = useState(false)
+
+    // État pour gérer le filtre actif
+    const [filtreActif, setFiltreActif] = useState<string>("")
+
     return (
-        <div className="grid grid-cols-1 md:grid-cols-[310px_1fr]">
-            <div className="flex min-h-screen">
-                <div className="fixed top-0 left-0 w-77.5 h-screen py-20 flex justify-start bg-gray-100 overflow-y-auto">
-                    <SideBar />
-                </div>
-                <div className="ml-77.5 flex-1 text-start px-10 py-20">
+        <div className="flex min-h-screen">
+            {/* Sidebar responsive */}
+            <SideBar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-                </div>
-            </div>
+            {/* Contenu principal - Adapté pour mobile */}
+            <div className="flex-1 lg:ml-77.5 w-full text-start px-4 md:px-6 lg:px-10 py-6 md:py-10 lg:py-20">
 
-            <div className="mx-10 my-20 max-w-7xl ">
-                <div className="flex justify-between">
-                    <div className="flex flex-col justify-between">
-                        <h1 className='text-3xl font-bold ms-4'>Dépenses</h1>
-                        <p className='ms-4 text-sm font-mono text-gray-500'>La liste de toutes les dépenses</p>
+                {/* Header - Responsive */}
+                <div className="mb-6">
+                    <h1 className='text-2xl md:text-3xl font-bold'>Dépenses</h1>
+                    <p className='text-xs md:text-sm font-mono text-gray-500 mt-1'>La liste de toutes les dépenses</p>
+                </div>
+
+                {/* Cartes statistiques - Carrousel sur mobile, Grid sur desktop */}
+                <div className="mb-6">
+                    {/* Carrousel mobile */}
+                    <div className="md:hidden">
+                        <div className="overflow-x-auto snap-x snap-mandatory flex gap-4 pb-4 scrollbar-hide px-1">
+                            <div className="snap-center shrink-0 w-[85%] h-full">
+                                <div className="h-full">
+                                    <ResteTotal />
+                                </div>
+                            </div>
+                            <div className="snap-center shrink-0 w-[85%] h-full">
+                                <div className="h-full">
+                                    <DepenseDuMois />
+                                </div>
+                            </div>
+                            <div className="snap-center shrink-0 w-[85%] h-full">
+                                <div className="h-full">
+                                    <BudgetTotalDuMois />
+                                </div>
+                            </div>
+                            <div className="snap-center shrink-0 w-[85%] h-full">
+                                <div className="h-full">
+                                    <EpargneDuMois />
+                                </div>
+                            </div>
+                        </div>
+                        {/* Indicateur de swipe */}
+                        <div className="flex justify-center gap-1 mt-2">
+                            <div className="w-2 h-2 rounded-full bg-gray-400"></div>
+                            <div className="w-2 h-2 rounded-full bg-gray-300"></div>
+                            <div className="w-2 h-2 rounded-full bg-gray-300"></div>
+                            <div className="w-2 h-2 rounded-full bg-gray-300"></div>
+                        </div>
                     </div>
 
-                    <div className="flex justify-end">
-                        <a href="#ajout-depense-modal" className="btn btn-neutral my-2">Ajouter une dépense</a>
+                    {/* Grid desktop */}
+                    <div className="hidden md:grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-5">
+                        <ResteTotal />
+                        <DepenseDuMois />
+                        <BudgetTotalDuMois />
+                        <EpargneDuMois />
                     </div>
                 </div>
 
-                <div className="flex gap-5 my-5 mx-4">
-                    <ResteTotal />
-                    <DepenseDuMois />
-                    <BudgetTotalDuMois />
-                    <EpargneDuMois />
+                {/* Bouton Ajouter une dépense - Aligné à droite */}
+                <div className="flex justify-end mb-5">
+                    <button
+                        type="button"
+                        onClick={() => setShowAddDepenseModal(true)}
+                        className="btn btn-neutral btn-xs md:btn-sm whitespace-nowrap"
+                    >
+                        Ajouter une dépense
+                    </button>
                 </div>
 
-                <div className=''>
-
-                    <form className='flex gap-3'>
-                        <input className="btn btn-xs rounded-3xl " type="checkbox" name="frameworks" aria-label="Jour" />
-                        <input className="btn btn-xs rounded-3xl" type="checkbox" name="frameworks" aria-label="Semaine" />
-                        <input className="btn btn-xs rounded-3xl" type="checkbox" name="frameworks" aria-label="Mois" />
-                        <input className="btn btn-xs rounded-3xl" type="checkbox" name="frameworks" aria-label="Année" />
-                        <input className="btn btn-xs rounded-3xl" type="checkbox" name="frameworks" aria-label="Date-1 - Date 2 " />
-                        <input className="btn btn-xs rounded-3xl" type="reset" value="×" />
-                    </form>
+                {/* Filtres - Responsive avec wrap */}
+                <div className='mb-5'>
+                    <div className='flex flex-wrap gap-2 md:gap-3'>
+                        <button
+                            type="button"
+                            onClick={() => setFiltreActif(filtreActif === "jour" ? "" : "jour")}
+                            className={`btn btn-xs md:btn-sm rounded-3xl ${filtreActif === "jour" ? "btn-neutral" : "btn-outline"}`}
+                        >
+                            Jour
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setFiltreActif(filtreActif === "semaine" ? "" : "semaine")}
+                            className={`btn btn-xs md:btn-sm rounded-3xl ${filtreActif === "semaine" ? "btn-neutral" : "btn-outline"}`}
+                        >
+                            Semaine
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setFiltreActif(filtreActif === "mois" ? "" : "mois")}
+                            className={`btn btn-xs md:btn-sm rounded-3xl ${filtreActif === "mois" ? "btn-neutral" : "btn-outline"}`}
+                        >
+                            Mois
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => setFiltreActif(filtreActif === "annee" ? "" : "annee")}
+                            className={`btn btn-xs md:btn-sm rounded-3xl ${filtreActif === "annee" ? "btn-neutral" : "btn-outline"}`}
+                        >
+                            Année
+                        </button>
+                        {filtreActif && (
+                            <button
+                                type="button"
+                                onClick={() => setFiltreActif("")}
+                                className="btn btn-xs md:btn-sm rounded-3xl btn-error"
+                            >
+                                × Réinitialiser
+                            </button>
+                        )}
+                    </div>
                 </div>
 
-                <div className="my-5">
-                    <ListeDepenses />
+                {/* Liste des dépenses */}
+                <div className="mb-6">
+                    <ListeDepenses filtreActif={filtreActif} />
                 </div>
 
-                <div>
-                    <AjoutDepenses />
-                </div>
+                {/* Modal */}
+                <AjoutDepenses
+                    isOpen={showAddDepenseModal}
+                    onClose={() => setShowAddDepenseModal(false)}
+                />
             </div>
         </div>
     )

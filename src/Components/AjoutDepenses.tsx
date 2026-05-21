@@ -1,18 +1,33 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Toasterror, Toastsuccess } from "../Controllers/ToastEmmiter"
 import axios from "axios"
 import type { DepenseType } from "../Types"
-import { UseUserStore } from "../Stores"
+import { UseUserStore, BudgetStore } from "../Stores"
 
-function AjoutDepenses() {
+type AjoutDepensesProps = {
+    isOpen?: boolean
+    onClose?: () => void
+    categoriePredefinie?: string
+}
+
+function AjoutDepenses({ isOpen = false, onClose, categoriePredefinie = "" }: AjoutDepensesProps) {
 
     const [titre, setTitre] = useState("")
     const [montant, setMontant] = useState<number>(0)
-    const [categorie, setCategorie] = useState("")
     const [load, setLoad] = useState(false)
 
-    
+    // La catégorie est déterminée par categoriePredefinie ou peut être saisie manuellement
+    const [categorie, setCategorie] = useState("")
+
     const { user } = UseUserStore()
+    const budget = BudgetStore(state => state.budget)
+
+    // Mettre à jour la catégorie quand categoriePredefinie change
+    useEffect(() => {
+        if (categoriePredefinie) {
+            setCategorie(categoriePredefinie)
+        }
+    }, [categoriePredefinie])
 
     const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
         try {
@@ -30,7 +45,7 @@ function AjoutDepenses() {
             //L'objet depenses a envoyé
             const objet: DepenseType = {
                 idUser: user.uid,
-                categorie,
+                categorie: categoriePredefinie || categorie,
                 titre,
                 depense: montant,
                 createdAt: Date.now()
@@ -45,10 +60,10 @@ function AjoutDepenses() {
             setMontant(0)
             setCategorie("")
 
-            Toastsuccess("Dépense ajouté avec succes")
+            Toastsuccess("Dépense ajoutée avec succès")
 
             //Fermerture du modal
-            document.getElementById("close")?.click()
+            if (onClose) onClose()
 
         } catch (error) {
             console.log(error)
@@ -59,26 +74,70 @@ function AjoutDepenses() {
 
     }
 
+    if (!isOpen) return null
+
     return (
-        <div>
-            <div className="modal" role="dialog" id="ajout-depense-modal">
-                <div className="modal-box">
-                    <h3 className="text-lg font-bold mb-3">Nouvelle dépense</h3>
-                    <form className="flex flex-col gap-3" onSubmit={submitForm}>
-                        <input value={titre} onChange={(e) => setTitre(e.target.value)} type="text" placeholder="Titre du dépense" required className="input input-lg w-full" />
-                        <input value={montant} onChange={(e) => setMontant(Number(e.target.value))} type="number" placeholder="Montant" required className="input input-lg w-full" />
-                        <input value={categorie} onChange={(e) => setCategorie(e.target.value)} type="text" placeholder="Catégorie du dépense" required className="input input-lg w-full" />
-                        <button type="submit" className="btn btn-neutral" disabled={load}>
-                            {!load ? (
-                                <span>Ajouter</span>
-                            ) : <span>En cours...</span>}
-                        </button>
-                    </form>
-                    <div className="modal-action">
-                        <a id="close" href="#" className="btn">Fermer !</a>
-                    </div>
+        <div className="modal modal-open">
+            <div className="modal-box">
+                <h3 className="text-lg font-bold mb-3">Nouvelle dépense</h3>
+                <form className="flex flex-col gap-3" onSubmit={submitForm}>
+                    {/* 1. Titre */}
+                    <input
+                        value={titre}
+                        onChange={(e) => setTitre(e.target.value)}
+                        type="text"
+                        placeholder="Titre de la dépense"
+                        required
+                        className="input input-lg w-full"
+                    />
+
+                    {/* 2. Montant */}
+                    <input
+                        value={montant}
+                        onChange={(e) => setMontant(Number(e.target.value))}
+                        type="number"
+                        placeholder="Montant"
+                        required
+                        className="input input-lg w-full"
+                    />
+
+                    {/* 3. Catégorie - Si prédéfinie, afficher en lecture seule, sinon liste déroulante */}
+                    {categoriePredefinie ? (
+                        <div className="bg-gray-100 border border-gray-300 rounded-lg p-4">
+                            <p className="text-sm text-gray-600">Catégorie</p>
+                            <p className="font-semibold text-lg">{categoriePredefinie}</p>
+                        </div>
+                    ) : (
+                        <select
+                            value={categorie}
+                            onChange={(e) => setCategorie(e.target.value)}
+                            required
+                            className="select select-lg w-full border-gray-300"
+                        >
+                            <option value="" disabled>Sélectionnez une catégorie</option>
+                            {budget && budget.length > 0 ? (
+                                budget.map((item) => (
+                                    <option key={item.id} value={item.tittre}>
+                                        {item.tittre}
+                                    </option>
+                                ))
+                            ) : (
+                                <option value="" disabled>Aucun budget disponible</option>
+                            )}
+                        </select>
+                    )}
+
+                    <button type="submit" className="btn btn-neutral" disabled={load}>
+                        {!load ? (
+                            <span>Ajouter</span>
+                        ) : <span>En cours...</span>}
+                    </button>
+                </form>
+                <div className="modal-action">
+                    <button type="button" onClick={onClose} className="btn">Fermer !</button>
                 </div>
             </div>
+            <div className="modal-backdrop" onClick={onClose}></div>
         </div>
     )
 }

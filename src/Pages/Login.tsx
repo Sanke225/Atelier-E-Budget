@@ -36,7 +36,7 @@ function Login() {
             Toastsuccess("Connexion reussi...")
 
         } catch (error: unknown) {
-            const firebaseError = error as { code?: string };
+            const firebaseError = error as { code?: string }
 
             //Les liens de retour a la console
             const message = {

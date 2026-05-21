@@ -67,18 +67,18 @@ const GraphiqueDepenses = () => {
     }, [])
 
     return (
-        <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm w-[220%] h-full flex flex-col justify-center">
-            <p className="text-xs font-medium uppercase tracking-widest text-gray-500 mb-1">
+        <div className="bg-white border border-gray-200 rounded-xl p-4 md:p-5 shadow-sm w-full h-full flex flex-col justify-center">
+            <p className="text-xs md:text-sm font-medium uppercase tracking-widest text-gray-500 mb-1">
                 Budgets vs Dépenses
             </p>
-            <p className="text-xs text-gray-400 mb-4">
+            <p className="text-xs text-gray-400 mb-3 md:mb-4">
                 {MOIS[moisActuel]} {anneeActuelle}
             </p>
-            <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={data} barGap={4}>
+            <ResponsiveContainer width="100%" height={250} className="text-xs md:text-sm">
+                <BarChart data={data} barGap={4} margin={{ top: 5, right: 5, left: -20, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis dataKey="nom" tick={{ fontSize: 11 }} />
-                    <YAxis tick={{ fontSize: 11 }} />
+                    <XAxis dataKey="nom" tick={{ fontSize: 10 }} angle={-45} textAnchor="end" height={60} />
+                    <YAxis tick={{ fontSize: 10 }} />
                     <Tooltip
                         formatter={(value, name) => [
                             `${Number(value).toLocaleString("fr-FR")} F CFA`,
