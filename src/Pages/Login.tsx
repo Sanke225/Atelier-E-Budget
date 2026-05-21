@@ -9,6 +9,7 @@ function Login() {
 
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
+    const [showResendButton, setShowResendButton] = useState(false)
 
 
     const submitForm = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -28,10 +29,13 @@ function Login() {
 
                 //J'envoie un email pour valider le compte user
                 await sendEmailVerification(data.user)
-                Toasterror("Compte non verifié. Un email vous a été envoyé pour valider votre compte.")
+                Toasterror("Compte non vérifié. Un email de vérification a été envoyé. Vérifiez vos spams.")
 
                 //Je deconnecte l'user
                 await signOut(auth)
+
+                // Afficher le bouton pour renvoyer l'email
+                setShowResendButton(true)
                 return;
             }
 
@@ -52,6 +56,32 @@ function Login() {
         }
     }
 
+    // Fonction pour renvoyer l'email de vérification
+    const resendVerificationEmail = async () => {
+        try {
+            if (!email || !password) {
+                Toasterror("Veuillez entrer votre email et mot de passe")
+                return
+            }
+
+            // Configurer la persistance locale
+            await setPersistence(auth, browserLocalPersistence)
+
+            // Se connecter temporairement
+            const data = await signInWithEmailAndPassword(auth, email, password)
+
+            // Renvoyer l'email
+            await sendEmailVerification(data.user)
+            Toastsuccess("Email de vérification renvoyé ! Vérifiez votre boîte mail et vos spams.")
+
+            // Se déconnecter
+            await signOut(auth)
+        } catch (error) {
+            console.error(error)
+            Toasterror("Erreur lors de l'envoi de l'email")
+        }
+    }
+
     return (
         <div>
             <div
@@ -67,9 +97,20 @@ function Login() {
 
                         <form onSubmit={submitForm} className='flex flex-col gap-5'>
                             <h2 className='text-2xl text-white font-bold mb-3'>Se connecter</h2>
-                            <input onChange={(e) => setEmail(e.target.value)} type="email" placeholder='E-mail' required className='input input-lg w-full placeholder:text-gray-400 focus:text-black' />
-                            <input onChange={(e) => setPassword(e.target.value)} type="password" placeholder='Mot de passe' required className='input input-lg w-full placeholder:text-gray-400 focus:text-black' />
+                            <input onChange={(e) => setEmail(e.target.value)} value={email} type="email" placeholder='E-mail' required className='input input-lg w-full placeholder:text-gray-400 focus:text-black' />
+                            <input onChange={(e) => setPassword(e.target.value)} value={password} type="password" placeholder='Mot de passe' required className='input input-lg w-full placeholder:text-gray-400 focus:text-black' />
                             <button type="submit" className='btn btn-neutral'>Se connecter</button>
+
+                            {/* Bouton pour renvoyer l'email de vérification */}
+                            {showResendButton && (
+                                <button
+                                    type="button"
+                                    onClick={resendVerificationEmail}
+                                    className='btn btn-outline btn-sm'
+                                >
+                                    Renvoyer l'email de vérification
+                                </button>
+                            )}
                         </form>
                         <div className='mt-5'>
                             <p>Pas encore membre ? <Link to="/signup" className="underline">Créer un compte</Link></p>
