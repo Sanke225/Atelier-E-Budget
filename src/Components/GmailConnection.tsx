@@ -43,9 +43,13 @@ function GmailConnection() {
 
             // Message spécifique pour popup bloqué
             if (error.code === 'auth/popup-blocked') {
-                Toasterror("Popup bloqué ! Veuillez autoriser les popups pour ce site.")
+                Toasterror("Popup bloqué ! Allez dans les paramètres de votre navigateur → Autorisations du site → Activer les popups")
             } else if (error.code === 'auth/popup-closed-by-user') {
-                Toasterror("Connexion annulée")
+                // L'utilisateur a fermé, pas besoin d'erreur
+                console.log("Popup fermé par l'utilisateur")
+            } else if (error.code === 'auth/cancelled-popup-request') {
+                // Popup déjà ouvert, pas besoin d'erreur
+                console.log("Popup déjà ouvert")
             } else {
                 Toasterror("Erreur lors de la connexion avec Google")
             }
@@ -58,6 +62,9 @@ function GmailConnection() {
                 <svg aria-label="Google logo" width="16" height="16" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><g><path d="m0 0H512V512H0" fill="#fff"></path><path fill="#34a853" d="M153 292c30 82 118 95 171 60h62v48A192 192 0 0190 341"></path><path fill="#4285f4" d="m386 400a140 175 0 0053-179H260v74h102q-7 37-38 57"></path><path fill="#fbbc02" d="m90 341a208 200 0 010-171l63 49q-12 37 0 73"></path><path fill="#ea4335" d="m153 219c22-69 116-109 179-50l55-54c-78-75-230-72-297 55"></path></g></svg>
                 Login with Google
             </button>
+            <p className="text-xs text-gray-600 mt-2 text-center">
+                Sur mobile : autorisez les popups dans les paramètres du navigateur
+            </p>
         </div>
     )
 }
