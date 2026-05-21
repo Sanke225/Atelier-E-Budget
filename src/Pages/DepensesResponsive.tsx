@@ -1,5 +1,5 @@
 import ListeDepenses from "../Components/ListeDepenses"
-import SideBarResponsive from "../Components/SideBarResponsive"
+import SideBar from "../Components/SideBar"
 import AjoutDepenses from "../Components/AjoutDepenses"
 import ResteTotal from "../Components/ResteTotal"
 import DepenseDuMois from "../Components/DepenseMensuelleCard"
@@ -10,7 +10,7 @@ function DepensesResponsive() {
     return (
         <div className="flex min-h-screen">
             {/* Sidebar responsive */}
-            <SideBarResponsive />
+            <SideBar />
 
             {/* Contenu principal - Adapté pour mobile */}
             <div className="flex-1 lg:ml-77.5 w-full">
