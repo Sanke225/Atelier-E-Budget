@@ -1,4 +1,4 @@
-import { GoogleAuthProvider, signInWithPopup, signInWithRedirect } from 'firebase/auth'
+import { GoogleAuthProvider, signInWithPopup, signInWithRedirect, setPersistence, browserLocalPersistence } from 'firebase/auth'
 import { Toasterror, Toastsuccess } from '../Controllers/ToastEmmiter'
 import { auth } from '../firebase'
 import { UseUserStore } from '../Stores'
@@ -16,6 +16,9 @@ function GmailConnection() {
 
     const Googleauth = async () => {
         try {
+            // Configurer la persistance locale
+            await setPersistence(auth, browserLocalPersistence)
+
             const provider = new GoogleAuthProvider()
 
             // Utiliser redirect sur mobile, popup sur desktop
@@ -23,7 +26,7 @@ function GmailConnection() {
                 // Sur mobile, utiliser redirect
                 await signInWithRedirect(auth, provider)
                 // La redirection va se faire automatiquement
-                // Le résultat sera géré dans App.tsx avec onAuthStateChanged
+                // Le résultat sera géré dans Login.tsx avec getRedirectResult
             } else {
                 // Sur desktop, utiliser popup
                 const data = await signInWithPopup(auth, provider)

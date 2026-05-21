@@ -1,7 +1,7 @@
 import { Link, useNavigate } from "react-router-dom"
 import GmailConnection from "../Components/GmailConnection"
 import { useState, useEffect } from "react"
-import { sendEmailVerification, signInWithEmailAndPassword, signOut, getRedirectResult } from "firebase/auth"
+import { sendEmailVerification, signInWithEmailAndPassword, signOut, getRedirectResult, setPersistence, browserLocalPersistence } from "firebase/auth"
 import { auth } from "../firebase"
 import { Toasterror, Toastsuccess } from "../Controllers/ToastEmmiter"
 import { UseUserStore } from "../Stores"
@@ -48,6 +48,8 @@ function Login() {
         e.preventDefault()
         try {
 
+            // Configurer la persistance locale
+            await setPersistence(auth, browserLocalPersistence)
 
             //Je connete l'user via firebase
             const data = await signInWithEmailAndPassword(auth, email, password)
